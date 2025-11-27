@@ -1,4 +1,5 @@
 import { setupDrawing } from './interaction.js';
+import { loadWeights } from './weights.js';
 
 const adapter = await navigator.gpu?.requestAdapter();
 const device = await adapter?.requestDevice();
@@ -6,6 +7,8 @@ if (!device) {
     window.alert('WebGPU not supported');
     throw new Error('WebGPU not supported');
 }
+
+const weights = await loadWeights(device);
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('webgpu');
