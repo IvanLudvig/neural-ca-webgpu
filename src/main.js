@@ -1,3 +1,5 @@
+import { setupDrawing } from './interaction.js';
+
 const adapter = await navigator.gpu?.requestAdapter();
 const device = await adapter?.requestDevice();
 if (!device) {
@@ -87,3 +89,4 @@ function render() {
 }
 
 render();
+setupDrawing(canvas, device, storageBuffer, W, H, D, render);
