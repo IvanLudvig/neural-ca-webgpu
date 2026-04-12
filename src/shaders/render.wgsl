@@ -46,6 +46,18 @@ fn fs(input: VertexOutput) -> @location(0) vec4f {
     let r = imageData[i];
     let g = imageData[i + 1u];
     let b = imageData[i + 2u];
+    let a = imageData[i + 3u];
 
-    return vec4f(r, g, b, 1.0);
+    // dead cell = white background
+    if (a < 0.01) {
+        return vec4f(1.0, 1.0, 1.0, 1.0);
+    }
+
+    // Alpha-premultiplied compositing on white background
+    let alpha_clamped = clamp(a, 0.0, 0.9999);
+    let rgb = vec3f(r, g, b);
+    let composited = 1.0 - alpha_clamped + rgb;
+    let final_color = clamp(composited, vec3f(0.0), vec3f(0.9999));
+
+    return vec4f(final_color, 1.0);
 }
