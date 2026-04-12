@@ -8,7 +8,7 @@ if (!device) {
     throw new Error('WebGPU not supported');
 }
 
-const weights = await loadWeights(device);
+const weights = await loadWeights(device, 'weights.json');
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('webgpu');

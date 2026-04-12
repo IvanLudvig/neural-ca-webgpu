@@ -1,5 +1,5 @@
-export async function loadWeights(device) {
-    const response = await fetch('weights.json');
+export async function loadWeights(device, path) {
+    const response = await fetch(path);
     const weights = await response.json();
     const buffers = {};
 
