@@ -8,7 +8,7 @@ if (!device) {
     throw new Error('WebGPU not supported');
 }
 
-const weights = await loadWeights(device, 'weights.json');
+const weights = await loadWeights(device, 'weights/cactus.json');
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('webgpu');
@@ -64,7 +64,8 @@ const computeBindGroupLayout = device.createBindGroupLayout({
         { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
         { binding: 3, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
         { binding: 4, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
-        { binding: 5, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
+        { binding: 5, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+        { binding: 6, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'uniform' } },
     ]
 });
 
@@ -77,7 +78,8 @@ const computeBindGroups = [
             { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
             { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
             { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
-            { binding: 5, resource: { buffer: seedBuffer } },
+            { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
+            { binding: 6, resource: { buffer: seedBuffer } },
         ]
     }),
     device.createBindGroup({
@@ -88,7 +90,8 @@ const computeBindGroups = [
             { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
             { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
             { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
-            { binding: 5, resource: { buffer: seedBuffer } },
+            { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
+            { binding: 6, resource: { buffer: seedBuffer } },
         ]
     })
 ];

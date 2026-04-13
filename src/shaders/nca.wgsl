@@ -7,7 +7,8 @@ const CHANNELS = 16u;
 @group(0) @binding(2) var<storage, read> fc0_weight: array<f32>;
 @group(0) @binding(3) var<storage, read> fc0_bias: array<f32>;
 @group(0) @binding(4) var<storage, read> fc1_weight: array<f32>;
-@group(0) @binding(5) var<uniform> seed: u32;
+@group(0) @binding(5) var<storage, read> fc1_bias: array<f32>;
+@group(0) @binding(6) var<uniform> seed: u32;
 
 fn getCell(x: i32, y: i32, c: u32) -> f32 {
     let wx = (x + i32(WIDTH)) % i32(WIDTH);
@@ -58,9 +59,9 @@ fn perceive(x: i32, y: i32) -> array<f32, 48> {
             }
         }
 
-        perception[c] = id;
-        perception[CHANNELS + c] = dx;
-        perception[CHANNELS * 2u + c] = dy;
+        perception[c * 3u] = id;
+        perception[c * 3u + 1u] = dx;
+        perception[c * 3u + 2u] = dy;
     }
 
     return perception;
@@ -84,7 +85,7 @@ fn linear_fc1(input: array<f32, 128>) -> array<f32, 16> {
     var output: array<f32, 16>;
 
     for (var i = 0u; i < 16u; i++) {
-        var sum = 0.0;
+        var sum = fc1_bias[i];
         for (var j = 0u; j < 128u; j++) {
             sum += input[j] * fc1_weight[i * 128u + j];
         }
