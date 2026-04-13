@@ -8,7 +8,9 @@ if (!device) {
     throw new Error('WebGPU not supported');
 }
 
-const weights = await loadWeights(device, 'weights/cactus.json');
+const selector = document.getElementById('weights-selector');
+
+let weights = await loadWeights(device, selector.value);
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('webgpu');
@@ -69,32 +71,36 @@ const computeBindGroupLayout = device.createBindGroupLayout({
     ]
 });
 
-const computeBindGroups = [
-    device.createBindGroup({
-        layout: computeBindGroupLayout,
-        entries: [
-            { binding: 0, resource: { buffer: stateBuffers[0] } },
-            { binding: 1, resource: { buffer: stateBuffers[1] } },
-            { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
-            { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
-            { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
-            { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
-            { binding: 6, resource: { buffer: seedBuffer } },
-        ]
-    }),
-    device.createBindGroup({
-        layout: computeBindGroupLayout,
-        entries: [
-            { binding: 0, resource: { buffer: stateBuffers[1] } },
-            { binding: 1, resource: { buffer: stateBuffers[0] } },
-            { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
-            { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
-            { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
-            { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
-            { binding: 6, resource: { buffer: seedBuffer } },
-        ]
-    })
-];
+function createComputeBindGroups(weights) {
+    return [
+        device.createBindGroup({
+            layout: computeBindGroupLayout,
+            entries: [
+                { binding: 0, resource: { buffer: stateBuffers[0] } },
+                { binding: 1, resource: { buffer: stateBuffers[1] } },
+                { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
+                { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
+                { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
+                { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
+                { binding: 6, resource: { buffer: seedBuffer } },
+            ]
+        }),
+        device.createBindGroup({
+            layout: computeBindGroupLayout,
+            entries: [
+                { binding: 0, resource: { buffer: stateBuffers[1] } },
+                { binding: 1, resource: { buffer: stateBuffers[0] } },
+                { binding: 2, resource: { buffer: weights['fc0.weight'].buffer } },
+                { binding: 3, resource: { buffer: weights['fc0.bias'].buffer } },
+                { binding: 4, resource: { buffer: weights['fc1.weight'].buffer } },
+                { binding: 5, resource: { buffer: weights['fc1.bias'].buffer } },
+                { binding: 6, resource: { buffer: seedBuffer } },
+            ]
+        })
+    ];
+}
+
+let computeBindGroups = createComputeBindGroups(weights);
 
 const computePipeline = device.createComputePipeline({
     layout: device.createPipelineLayout({
@@ -184,3 +190,16 @@ function loop() {
 
 loop();
 setupDrawing(canvas, device, stateBuffers[0], W, H, D, update);
+
+selector.addEventListener('change', async () => {
+    weights = await loadWeights(device, selector.value);
+    computeBindGroups = createComputeBindGroups(weights);
+
+    // Reset state
+    const resetData = new Float32Array(H * W * D);
+    const sid = (centerY * W + centerX) * D;
+    for (let c = 3; c < D; c++) resetData[sid + c] = 1.0;
+    device.queue.writeBuffer(stateBuffers[0], 0, resetData);
+    device.queue.writeBuffer(stateBuffers[1], 0, new Float32Array(H * W * D));
+    step = 0;
+});
