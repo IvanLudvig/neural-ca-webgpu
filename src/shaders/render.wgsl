@@ -30,7 +30,8 @@ fn vs(
         instanceIndex / WIDTH
     );
     let cellSize = 2.0 / vec2f(f32(WIDTH), f32(HEIGHT));
-    let cellPos = vec2f(cellCoords) * cellSize - 1.0;
+    let flippedY = vec2u(cellCoords.x, HEIGHT - 1u - cellCoords.y);
+    let cellPos = vec2f(flippedY) * cellSize - 1.0;
     let vertexPos = vertices[vertexIndex] * cellSize;
 
     output.position = vec4f(vertexPos + cellPos, 0.0, 1.0);

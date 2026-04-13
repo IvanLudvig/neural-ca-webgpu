@@ -13,7 +13,7 @@ export function setupDrawing(canvas, device, storageBuffer, W, H, D, render) {
     function paintCell(event) {
         const rect = canvas.getBoundingClientRect();
         const x = Math.floor((event.clientX - rect.left) / rect.width * W);
-        const y = Math.floor((1 - (event.clientY - rect.top) / rect.height) * H);
+        const y = Math.floor((event.clientY - rect.top) / rect.height * H);
 
         if (x < 0 || x >= W || y < 0 || y >= H) return;
         if (x === lastPaintedX && y === lastPaintedY) return;
