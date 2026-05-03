@@ -9,6 +9,15 @@ body {
     align-items: center;
     justify-content: center;
     gap: 16px;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+canvas {
+    width: 90%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1;
 }
 
 h1 {
