@@ -18,15 +18,18 @@ canvas {
     max-width: 400px;
     height: auto;
     aspect-ratio: 1;
+    cursor: crosshair;
+}
+
+.interactive-label {
+    font-size: 0.9rem;
+    opacity: 0.4;
+    letter-spacing: 0.1em;
 }
 
 h1 {
     margin: 0;
-}
-
-h2 {
-    font-weight: normal;
-    margin: 0;
+    text-align: center;
 }
 
 a {
@@ -39,6 +42,11 @@ html, body {
 }
 
 #weights-selector {
-    margin-top: 32px;
+    margin-top: 8px;
     font-size: 1.5rem;
+}
+
+.links {
+    display: flex;
+    gap: 16px;
 }

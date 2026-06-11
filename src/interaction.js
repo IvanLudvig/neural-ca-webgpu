@@ -40,26 +40,18 @@ export function setupDrawing(canvas, device, storageBuffer, W, H, D, render) {
         }
     }
 
-    canvas.addEventListener('mousedown', (event) => {
-        isDrawing = true;
-        paintCell(event);
-    });
-
-    canvas.addEventListener('mousemove', (event) => {
-        if (isDrawing) {
-            schedulePaint(event);
-        }
-    });
-
-    canvas.addEventListener('mouseup', () => {
+    function stopDrawing() {
         isDrawing = false;
         lastPaintedX = -1;
         lastPaintedY = -1;
-    });
+    }
 
-    canvas.addEventListener('mouseleave', () => {
-        isDrawing = false;
-        lastPaintedX = -1;
-        lastPaintedY = -1;
-    });
+    canvas.addEventListener('mousedown', (e) => { isDrawing = true; paintCell(e); });
+    canvas.addEventListener('mousemove', (e) => { if (isDrawing) schedulePaint(e); });
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseleave', stopDrawing);
+
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDrawing = true; paintCell(e.touches[0]); }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if (isDrawing) schedulePaint(e.touches[0]); }, { passive: false });
+    canvas.addEventListener('touchend', stopDrawing);
 }
