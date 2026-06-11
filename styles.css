@@ -19,6 +19,7 @@ canvas {
     height: auto;
     aspect-ratio: 1;
     cursor: crosshair;
+    touch-action: none;
 }
 
 .interactive-label {
