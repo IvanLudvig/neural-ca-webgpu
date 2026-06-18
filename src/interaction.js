@@ -10,19 +10,34 @@ export function setupDrawing(canvas, device, storageBuffer, W, H, D, render) {
     whiteCell[1] = 1.0; // G
     whiteCell[2] = 1.0; // B
 
+    const radius = 2;
+    const radiusSq = radius * radius;
+
     function paintCell(event) {
         const rect = canvas.getBoundingClientRect();
-        const x = Math.floor((event.clientX - rect.left) / rect.width * W);
-        const y = Math.floor((event.clientY - rect.top) / rect.height * H);
+        const cx = Math.floor((event.clientX - rect.left) / rect.width * W);
+        const cy = Math.floor((event.clientY - rect.top) / rect.height * H);
 
-        if (x < 0 || x >= W || y < 0 || y >= H) return;
-        if (x === lastPaintedX && y === lastPaintedY) return;
+        if (cx < 0 || cx >= W || cy < 0 || cy >= H) return;
+        if (cx === lastPaintedX && cy === lastPaintedY) return;
 
-        lastPaintedX = x;
-        lastPaintedY = y;
+        lastPaintedX = cx;
+        lastPaintedY = cy;
 
-        const cellOffset = (y * W + x) * D * Float32Array.BYTES_PER_ELEMENT;
-        device.queue.writeBuffer(storageBuffer, cellOffset, whiteCell);
+        // paint cells inside circular brush
+        const rInt = Math.ceil(radius);
+        for (let dy = -rInt; dy <= rInt; dy++) {
+            const y = cy + dy;
+            if (y < 0 || y >= H) continue;
+            for (let dx = -rInt; dx <= rInt; dx++) {
+                const x = cx + dx;
+                if (x < 0 || x >= W) continue;
+                if ((dx * dx + dy * dy) > radiusSq) continue;
+
+                const cellOffset = (y * W + x) * D * Float32Array.BYTES_PER_ELEMENT;
+                device.queue.writeBuffer(storageBuffer, cellOffset, whiteCell);
+            }
+        }
     }
 
     function flushPendingPaint() {
